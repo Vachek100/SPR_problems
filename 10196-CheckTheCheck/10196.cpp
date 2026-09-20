@@ -2,358 +2,287 @@
 #include <string>
 #include <cstdio>
 
-void markPawnMoves(std::vector<std::string>& board, int row, int col) {
 
-    char pawn = board[row][col];
+bool pawnAttacks(std::vector<std::string>& board,
+                 int row, int col,
+                 int kingRow, int kingCol) {
 
-    // =========================================
-    // BÍLÝ PĚŠEC
-    // =========================================
+    if (board[row][col] == 'P') {
 
-    if (pawn == 'P') {
+        int newRow = row - 1;
 
-        // Bílý pěšec se pohybuje nahoru
-        int nextRow = row - 1;
+        if (newRow >= 0) {
 
-        // Pohyb o jedno pole dopředu
-        if (nextRow >= 0 && board[nextRow][col] == '.') {
-            board[nextRow][col] = '*';
-
-            // Pohyb o dvě pole - pouze z výchozí řady
-            if (row == 6 && board[row - 2][col] == '.') {
-                board[row - 2][col] = '*';
+            if (col - 1 >= 0 &&
+                newRow == kingRow &&
+                col - 1 == kingCol) {
+                return true;
             }
-        }
 
-        // Braní vlevo
-        if (nextRow >= 0 && col - 1 >= 0) {
-            char target = board[nextRow][col - 1];
-
-            // Černá figura
-            if (target >= 'a' && target <= 'z') {
-                board[nextRow][col - 1] = '*';
-            }
-        }
-
-        // Braní vpravo
-        if (nextRow >= 0 && col + 1 < 8) {
-            char target = board[nextRow][col + 1];
-
-            // Černá figura
-            if (target >= 'a' && target <= 'z') {
-                board[nextRow][col + 1] = '*';
+            if (col + 1 < 8 &&
+                newRow == kingRow &&
+                col + 1 == kingCol) {
+                return true;
             }
         }
     }
 
+    if (board[row][col] == 'p') {
 
-    // =========================================
-    // ČERNÝ PĚŠEC
-    // =========================================
+        int newRow = row + 1;
 
-    else if (pawn == 'p') {
+        if (newRow < 8) {
 
-        // Černý pěšec se pohybuje dolů
-        int nextRow = row + 1;
-
-        // Pohyb o jedno pole dopředu
-        if (nextRow < 8 && board[nextRow][col] == '.') {
-            board[nextRow][col] = '*';
-
-            // Pohyb o dvě pole - pouze z výchozí řady
-            if (row == 1 && board[row + 2][col] == '.') {
-                board[row + 2][col] = '*';
+            if (col - 1 >= 0 &&
+                newRow == kingRow &&
+                col - 1 == kingCol) {
+                return true;
             }
-        }
 
-        // Braní vlevo
-        if (nextRow < 8 && col - 1 >= 0) {
-            char target = board[nextRow][col - 1];
-
-            // Bílá figura
-            if (target >= 'A' && target <= 'Z') {
-                board[nextRow][col - 1] = '*';
-            }
-        }
-
-        // Braní vpravo
-        if (nextRow < 8 && col + 1 < 8) {
-            char target = board[nextRow][col + 1];
-
-            // Bílá figura
-            if (target >= 'A' && target <= 'Z') {
-                board[nextRow][col + 1] = '*';
+            if (col + 1 < 8 &&
+                newRow == kingRow &&
+                col + 1 == kingCol) {
+                return true;
             }
         }
     }
+
+    return false;
 }
 
-void markRookMoves(std::vector<std::string>& board, int row, int col) {
 
-    char rook = board[row][col];
+bool rookAttacks(std::vector<std::string>& board,
+                 int row, int col,
+                 int kingRow, int kingCol) {
 
-    // =========================================
-    // BÍLÁ VĚŽ a ČERNÁ VĚŽ POHYB
-    // =========================================
+    for (int i = 1; i < 8; i++) {
 
-    if (rook == 'R' || rook == 'r') {
+        int newRow = row - i;
 
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-
-            if (newRow < 0) {
-                break;
-            }
-
-            if (board[newRow][col] == '.' || board[newRow][col] == '*') {
-                board[newRow][col] = '*';
-            } else {
-                break;
-            }
+        if (newRow < 0) {
+            break;
         }
 
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-
-            if (newRow >= 8) {
-                break;
-            }
-
-            if (board[newRow][col] == '.' || board[newRow][col] == '*') {
-                board[newRow][col] = '*';
-            } else {
-                break;
-            }
+        if (newRow == kingRow && col == kingCol) {
+            return true;
         }
 
-        for (int i = 1; i < 8; i++) {
-            int newCol = col + i;
-
-            if (newCol >= 8) {
-                break;
-            }
-
-            if (board[row][newCol] == '.' || board[row][newCol] == '*') {
-                board[row][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newCol = col - i;
-
-            if (newCol < 0) {
-                break;
-            }
-
-            if (board[row][newCol] == '.' || board[row][newCol] == '*') {
-                board[row][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-    }
-}
-
-void markBishopMoves(std::vector<std::string>& board, int row, int col) {
-
-    char bishop = board[row][col];
-
-    if (bishop == 'B' || bishop == 'b') {
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-            int newCol = col + i;
-
-            if (newRow < 0 || newCol >= 8) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-            int newCol = col - i;
-
-            if (newRow < 0 || newCol < 0) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-            int newCol = col + i;
-
-            if (newRow >= 8 || newCol >= 8) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-            int newCol = col - i;
-
-            if (newRow >= 8 || newCol < 0) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
+        if (board[newRow][col] != '.') {
+            break;
         }
     }
 
-}
+    for (int i = 1; i < 8; i++) {
 
-void markQueenMoves(std::vector<std::string>& board, int row, int col) {
+        int newRow = row + i;
 
-    char queen = board[row][col];
-
-    if (queen == 'Q' || queen == 'q') {
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-            int newCol = col + i;
-
-            if (newRow < 0 || newCol >= 8) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
+        if (newRow >= 8) {
+            break;
         }
 
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-            int newCol = col - i;
-
-            if (newRow < 0 || newCol < 0) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
+        if (newRow == kingRow && col == kingCol) {
+            return true;
         }
 
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-            int newCol = col + i;
-
-            if (newRow >= 8 || newCol >= 8) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
+        if (board[newRow][col] != '.') {
+            break;
         }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-            int newCol = col - i;
-
-            if (newRow >= 8 || newCol < 0) {
-                break;
-            }
-
-            if (board[newRow][newCol] == '.' || board[newRow][newCol] == '*') {
-                board[newRow][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row - i;
-
-            if (newRow < 0) {
-                break;
-            }
-
-            if (board[newRow][col] == '.' || board[newRow][col] == '*') {
-                board[newRow][col] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newRow = row + i;
-
-            if (newRow >= 8) {
-                break;
-            }
-
-            if (board[newRow][col] == '.' || board[newRow][col] == '*') {
-                board[newRow][col] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newCol = col + i;
-
-            if (newCol >= 8) {
-                break;
-            }
-
-            if (board[row][newCol] == '.' || board[row][newCol] == '*') {
-                board[row][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 1; i < 8; i++) {
-            int newCol = col - i;
-
-            if (newCol < 0) {
-                break;
-            }
-
-            if (board[row][newCol] == '.' || board[row][newCol] == '*') {
-                board[row][newCol] = '*';
-            } else {
-                break;
-            }
-        }
-
-
-
     }
 
+    for (int i = 1; i < 8; i++) {
+
+        int newCol = col + i;
+
+        if (newCol >= 8) {
+            break;
+        }
+
+        if (row == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[row][newCol] != '.') {
+            break;
+        }
+    }
+
+    for (int i = 1; i < 8; i++) {
+
+        int newCol = col - i;
+
+        if (newCol < 0) {
+            break;
+        }
+
+        if (row == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[row][newCol] != '.') {
+            break;
+        }
+    }
+
+    return false;
 }
 
+
+bool bishopAttacks(std::vector<std::string>& board,
+                   int row, int col,
+                   int kingRow, int kingCol) {
+
+    for (int i = 1; i < 8; i++) {
+
+        int newRow = row - i;
+        int newCol = col + i;
+
+        if (newRow < 0 || newCol >= 8) {
+            break;
+        }
+
+        if (newRow == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[newRow][newCol] != '.') {
+            break;
+        }
+    }
+
+    for (int i = 1; i < 8; i++) {
+
+        int newRow = row - i;
+        int newCol = col - i;
+
+        if (newRow < 0 || newCol < 0) {
+            break;
+        }
+
+        if (newRow == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[newRow][newCol] != '.') {
+            break;
+        }
+    }
+
+    for (int i = 1; i < 8; i++) {
+
+        int newRow = row + i;
+        int newCol = col + i;
+
+        if (newRow >= 8 || newCol >= 8) {
+            break;
+        }
+
+        if (newRow == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[newRow][newCol] != '.') {
+            break;
+        }
+    }
+
+    for (int i = 1; i < 8; i++) {
+
+        int newRow = row + i;
+        int newCol = col - i;
+
+        if (newRow >= 8 || newCol < 0) {
+            break;
+        }
+
+        if (newRow == kingRow && newCol == kingCol) {
+            return true;
+        }
+
+        if (board[newRow][newCol] != '.') {
+            break;
+        }
+    }
+
+    return false;
+}
+
+
+bool queenAttacks(std::vector<std::string>& board,
+                  int row, int col,
+                  int kingRow, int kingCol) {
+
+    if (bishopAttacks(board, row, col, kingRow, kingCol)) {
+        return true;
+    }
+
+    if (rookAttacks(board, row, col, kingRow, kingCol)) {
+        return true;
+    }
+
+    return false;
+}
+
+
+bool kingAttacks(std::vector<std::string>& board,
+                 int row, int col,
+                 int kingRow, int kingCol) {
+
+    int rowDifference = row - kingRow;
+
+    if (rowDifference < 0) {
+        rowDifference = -rowDifference;
+    }
+
+    int colDifference = col - kingCol;
+
+    if (colDifference < 0) {
+        colDifference = -colDifference;
+    }
+
+    return rowDifference <= 1 &&
+           colDifference <= 1 &&
+           !(rowDifference == 0 && colDifference == 0);
+}
+
+
+bool knightAttacks(std::vector<std::string>& board,
+                   int row, int col,
+                   int kingRow, int kingCol) {
+
+    if (row - 2 == kingRow && col - 1 == kingCol) {
+        return true;
+    }
+
+    if (row - 2 == kingRow && col + 1 == kingCol) {
+        return true;
+    }
+
+    if (row + 2 == kingRow && col - 1 == kingCol) {
+        return true;
+    }
+
+    if (row + 2 == kingRow && col + 1 == kingCol) {
+        return true;
+    }
+
+    if (row - 1 == kingRow && col - 2 == kingCol) {
+        return true;
+    }
+
+    if (row - 1 == kingRow && col + 2 == kingCol) {
+        return true;
+    }
+
+    if (row + 1 == kingRow && col - 2 == kingCol) {
+        return true;
+    }
+
+    if (row + 1 == kingRow && col + 2 == kingCol) {
+        return true;
+    }
+
+    return false;
+}
 
 
 int main(int argc, char *argv[]) {
@@ -364,8 +293,8 @@ int main(int argc, char *argv[]) {
 
         std::vector<std::string> board(8);
 
-        // Načtení šachovnice
         for (int i = 0; i < 8; i++) {
+
             char row[9];
 
             if (fscanf(stdin, "%8s", row) != 1) {
@@ -375,58 +304,185 @@ int main(int argc, char *argv[]) {
             board[i] = row;
         }
 
-        // Kontrola konce vstupu
-        bool end = true;
+        bool emptyBoard = true;
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] != '.') {
-                    end = false;
+        for (int row = 0; row < 8; row++) {
+
+            for (int col = 0; col < 8; col++) {
+
+                if (board[row][col] != '.') {
+                    emptyBoard = false;
                     break;
                 }
             }
 
-            if (!end) {
+            if (!emptyBoard) {
                 break;
             }
         }
 
-        if (end) {
-            fprintf(stdout, "\nKONECNA BOARDA KTERA SE NEKONTROLUJE\n");
+        if (emptyBoard) {
             break;
         }
 
-        // Hledání postaviček
+        int whiteKingRow = -1;
+        int whiteKingCol = -1;
+
+        int blackKingRow = -1;
+        int blackKingCol = -1;
+
         for (int row = 0; row < 8; row++) {
+
             for (int col = 0; col < 8; col++) {
 
-                if (board[row][col] == 'P' ||
-                    board[row][col] == 'p') {
-
-                    markPawnMoves(board, row, col);
-                }else if (board[row][col] == 'R' ||
-                    board[row][col] == 'r') {
-
-                    markRookMoves(board, row, col);
-                }else if (board[row][col] == 'B' ||
-                    board[row][col] == 'b') {
-
-                    markBishopMoves(board, row, col);
-                }else if (board[row][col] == 'Q' ||
-                    board[row][col] == 'q') {
-
-                    markQueenMoves(board, row, col);
+                if (board[row][col] == 'K') {
+                    whiteKingRow = row;
+                    whiteKingCol = col;
                 }
 
+                if (board[row][col] == 'k') {
+                    blackKingRow = row;
+                    blackKingCol = col;
+                }
             }
         }
 
-        // Výpis šachovnice
-        for (int i = 0; i < 8; i++) {
-            fprintf(stdout, "%s\n", board[i].c_str());
+        bool whiteInCheck = false;
+        bool blackInCheck = false;
+
+        for (int row = 0; row < 8; row++) {
+
+            for (int col = 0; col < 8; col++) {
+
+                char piece = board[row][col];
+
+
+                // ČERNÉ FIGURY -> kontrolují bílého krále
+                if (piece == 'p') {
+
+                    if (pawnAttacks(board, row, col,
+                                    whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+                else if (piece == 'r') {
+
+                    if (rookAttacks(board, row, col,
+                                    whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+                else if (piece == 'b') {
+
+                    if (bishopAttacks(board, row, col,
+                                      whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+                else if (piece == 'q') {
+
+                    if (queenAttacks(board, row, col,
+                                     whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+                else if (piece == 'n') {
+
+                    if (knightAttacks(board, row, col,
+                                      whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+                else if (piece == 'k') {
+
+                    if (kingAttacks(board, row, col,
+                                    whiteKingRow, whiteKingCol)) {
+                        whiteInCheck = true;
+                    }
+                }
+
+
+                // BÍLÉ FIGURY -> kontrolují černého krále
+                else if (piece == 'P') {
+
+                    if (pawnAttacks(board, row, col,
+                                    blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+
+                else if (piece == 'R') {
+
+                    if (rookAttacks(board, row, col,
+                                    blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+
+                else if (piece == 'B') {
+
+                    if (bishopAttacks(board, row, col,
+                                      blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+
+                else if (piece == 'Q') {
+
+                    if (queenAttacks(board, row, col,
+                                     blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+
+                else if (piece == 'N') {
+
+                    if (knightAttacks(board, row, col,
+                                      blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+
+                else if (piece == 'K') {
+
+                    if (kingAttacks(board, row, col,
+                                    blackKingRow, blackKingCol)) {
+                        blackInCheck = true;
+                    }
+                }
+            }
         }
-        fprintf(stdout, "\n");
+
+
+        // Výstup
+        if (whiteInCheck) {
+
+            fprintf(stdout,
+                    "Game #%d: white king is in check.\n",
+                    gameNum);
+
+        } else if (blackInCheck) {
+
+            fprintf(stdout,
+                    "Game #%d: black king is in check.\n",
+                    gameNum);
+
+        } else {
+
+            fprintf(stdout,
+                    "Game #%d: no king is in check.\n",
+                    gameNum);
+        }
+
+
+        gameNum++;
     }
+
 
     return 0;
 }
